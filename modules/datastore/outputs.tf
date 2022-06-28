@@ -18,6 +18,11 @@ output "database_username" {
   description = "The database username"
 }
 
+output "database_sg_id" {
+  value       = aws_security_group.rds_security_group.id
+  description = "The RDS security group ID to attach new rules"
+}
+
 output "datastore_s3_bucket_kms_key_arn" {
   value       = aws_kms_key.s3.arn
   description = "The ARN of the KMS key used to encrypt the Metaflow datastore S3 bucket"

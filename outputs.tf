@@ -109,6 +109,11 @@ output "metaflow_s3_bucket_arn" {
   description = "The ARN of the bucket we'll be using as blob storage"
 }
 
+output "metaflow_rds_sg_id" {
+  value = module.metaflow-datastore.database_sg_id
+  description = "The security group ID of the metaflow RDS instance"
+}
+
 output "migration_function_arn" {
   value       = module.metaflow-metadata-service.migration_function_arn
   description = "ARN of DB Migration Function"
