@@ -23,23 +23,27 @@ resource "aws_security_group" "rds_security_group" {
   name   = local.rds_security_group_name
   vpc_id = var.metaflow_vpc_id
 
-  # ingress only from port 5432
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [var.metadata_service_security_group_id]
-  }
-
-  # egress to anywhere
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = var.standard_tags
+}
+
+# ingress only from port 5432
+resource "aws_security_group_rule" "rds_sg_ingress" {
+  type = "ingress"
+  from_port = 5432
+  to_port = 5432
+  protocol = "tcp"
+  source_security_group_id = var.metadata_service_security_group_id
+  security_group_id = aws_security_group.rds_security_group.id
+}
+
+# egress to anywhere
+resource "aws_security_group_rule" "rds_sg_egress" {
+  type = "egress"
+  from_port = 0
+  to_port = 0
+  protocol = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.rds_security_group.id
 }
 
 resource "random_password" "this" {
