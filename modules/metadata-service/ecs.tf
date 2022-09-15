@@ -19,8 +19,8 @@ resource "aws_ecs_task_definition" "this" {
     "name": "${var.resource_prefix}service${var.resource_suffix}",
     "image": "${var.metadata_service_container_image}",
     "essential": true,
-    "cpu": 512,
-    "memory": 1024,
+    "cpu": ${var.metadata_service_cpu},
+    "memory": ${var.metadata_service_memory},
     "portMappings": [
       {
         "containerPort": 8080,
@@ -33,7 +33,7 @@ resource "aws_ecs_task_definition" "this" {
     ],
     "environment": [
       {"name": "MF_METADATA_DB_HOST", "value": "${replace(var.rds_master_instance_endpoint, ":5432", "")}"},
-      {"name": "MF_METADATA_DB_NAME", "value": "metaflow"},
+      {"name": "MF_METADATA_DB_NAME", "value": "${var.database_name}"},
       {"name": "MF_METADATA_DB_PORT", "value": "5432"},
       {"name": "MF_METADATA_DB_PSWD", "value": "${var.database_password}"},
       {"name": "MF_METADATA_DB_USER", "value": "${var.database_username}"}
@@ -54,8 +54,8 @@ EOF
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.metadata_svc_ecs_task_role.arn
   execution_role_arn       = var.fargate_execution_role_arn
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = var.metadata_service_cpu
+  memory                   = var.metadata_service_memory
 
   tags = merge(
     var.standard_tags,
@@ -74,7 +74,7 @@ resource "aws_ecs_service" "this" {
 
   network_configuration {
     security_groups  = [aws_security_group.metadata_service_security_group.id]
-    assign_public_ip = true
+    assign_public_ip = var.with_public_ip
     subnets          = [var.subnet1_id, var.subnet2_id]
   }
 

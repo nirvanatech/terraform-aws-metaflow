@@ -20,7 +20,7 @@ data "aws_availability_zones" "available" {
 
 module "metaflow-datastore" {
   source  = "outerbounds/metaflow/aws//modules/datastore"
-  version = "0.5.2"
+  version = "0.7.1"
 
   force_destroy_s3_bucket = true
 
@@ -37,18 +37,19 @@ module "metaflow-datastore" {
 
 module "metaflow-common" {
   source  = "outerbounds/metaflow/aws//modules/common"
-  version = "0.3.2"
+  version = "0.7.1"
 }
 
 module "metaflow-metadata-service" {
   source  = "outerbounds/metaflow/aws//modules/metadata-service"
-  version = "0.3.2"
+  version = "0.7.1"
 
   resource_prefix = local.resource_prefix
   resource_suffix = local.resource_suffix
 
   access_list_cidr_blocks          = []
   api_basic_auth                   = true
+  database_name                    = module.metaflow-datastore.database_name
   database_password                = module.metaflow-datastore.database_password
   database_username                = module.metaflow-datastore.database_username
   datastore_s3_bucket_kms_key_arn  = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
@@ -59,7 +60,7 @@ module "metaflow-metadata-service" {
   s3_bucket_arn                    = module.metaflow-datastore.s3_bucket_arn
   subnet1_id                       = module.vpc.private_subnets[0]
   subnet2_id                       = module.vpc.private_subnets[1]
-  vpc_cidr_block                   = module.vpc.vpc_cidr_block
+  vpc_cidr_blocks                  = [module.vpc.vpc_cidr_block]
 
   standard_tags = local.tags
 }
