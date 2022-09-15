@@ -79,6 +79,12 @@ variable "metadata_service_container_image" {
   description = "Container image for metadata service"
 }
 
+variable "metadata_service_with_public_ip" {
+  type        = bool
+  default     = false
+  description = "Enable private IP for metadata service"
+}
+
 variable "ui_static_container_image" {
   type        = string
   default     = ""
@@ -140,4 +146,31 @@ variable "extra_ui_static_env_vars" {
   type        = map(string)
   default     = {}
   description = "Additional environment variables for UI static app"
+}
+
+variable "cognito_user_pool_arn" {
+  type = string
+  description = "Cognito user pool ARN"
+  default = ""
+}
+
+variable "cognito_user_pool_client_id" {
+  type = string
+  description = "Cognito user pool client id"
+  default = ""
+}
+
+variable "cognito_user_pool_domain" {
+  type = string
+  description = "Cognito user pool domain"
+  default = ""
+}
+variable "datastore_db_engine" {
+  type    = string
+  default = "postgres"
+}
+
+variable "datastore_db_engine_version" {
+  type    = string
+  default = "11"
 }

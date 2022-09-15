@@ -9,6 +9,9 @@ module "metaflow-datastore" {
   subnet1_id                         = var.subnet1_id
   subnet2_id                         = var.subnet2_id
 
+  db_engine         = var.datastore_db_engine
+  db_engine_version = var.datastore_db_engine_version
+
   standard_tags = var.tags
 }
 
@@ -33,6 +36,7 @@ module "metaflow-metadata-service" {
   subnet1_id                       = var.subnet1_id
   subnet2_id                       = var.subnet2_id
   vpc_cidr_blocks                  = var.vpc_cidr_blocks
+  with_public_ip                   = var.metadata_service_with_public_ip
 
   standard_tags = var.tags
 }
@@ -67,6 +71,11 @@ module "metaflow-ui" {
   extra_ui_static_env_vars  = var.extra_ui_static_env_vars
   extra_ui_backend_env_vars = var.extra_ui_backend_env_vars
   standard_tags             = var.tags
+
+  cognito_user_pool_arn       = var.cognito_user_pool_arn
+  cognito_user_pool_client_id = var.cognito_user_pool_client_id
+  cognito_user_pool_domain    = var.cognito_user_pool_domain
+
 }
 
 module "metaflow-computation" {
