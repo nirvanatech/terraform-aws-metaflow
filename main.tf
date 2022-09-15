@@ -9,7 +9,7 @@ module "metaflow-datastore" {
   subnet1_id                         = var.subnet1_id
   subnet2_id                         = var.subnet2_id
 
-  db_engine = var.datastore_db_engine
+  db_engine         = var.datastore_db_engine
   db_engine_version = var.datastore_db_engine_version
 
   standard_tags = var.tags
@@ -36,6 +36,7 @@ module "metaflow-metadata-service" {
   subnet1_id                       = var.subnet1_id
   subnet2_id                       = var.subnet2_id
   vpc_cidr_blocks                  = var.vpc_cidr_blocks
+  with_public_ip                   = var.metadata_service_with_public_ip
 
   standard_tags = var.tags
 }

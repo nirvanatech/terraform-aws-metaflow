@@ -79,6 +79,12 @@ variable "metadata_service_container_image" {
   description = "Container image for metadata service"
 }
 
+variable "metadata_service_with_public_ip" {
+  type        = bool
+  default     = false
+  description = "Enable private IP for metadata service"
+}
+
 variable "ui_static_container_image" {
   type        = string
   default     = ""
