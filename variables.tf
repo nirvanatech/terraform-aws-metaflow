@@ -159,3 +159,12 @@ variable "cognito_user_pool_domain" {
   description = "Cognito user pool domain"
   default = ""
 }
+variable "datastore_db_engine" {
+  type    = string
+  default = "postgres"
+}
+
+variable "datastore_db_engine_version" {
+  type    = string
+  default = "11"
+}

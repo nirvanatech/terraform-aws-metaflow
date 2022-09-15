@@ -9,6 +9,9 @@ module "metaflow-datastore" {
   subnet1_id                         = var.subnet1_id
   subnet2_id                         = var.subnet2_id
 
+  db_engine = var.datastore_db_engine
+  db_engine_version = var.datastore_db_engine_version
+
   standard_tags = var.tags
 }
 
