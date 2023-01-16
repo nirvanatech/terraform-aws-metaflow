@@ -138,7 +138,7 @@ resource "aws_db_instance" "this" {
   # enable long tail query logging and export logs to CW so that they are not
   # deleted on expiry.
   parameter_group_name            = aws_db_parameter_group.db_metaflow.name
-  enabled_cloudwatch_logs_exports = "postgresql"
+  enabled_cloudwatch_logs_exports = ["postgresql"]
 
   tags = merge(
     var.standard_tags,
