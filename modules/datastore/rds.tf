@@ -98,7 +98,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 
 resource "aws_db_parameter_group" "db_metaflow" {
   name   = "${var.resource_prefix}${var.db_name}-parameters${var.resource_suffix}"
-  family = "${var.db_engine}${var.db_engine_version}"
+  family = "postgres11"
 
   # long-tail query logging for queries taking > 100 ms
   parameter {
