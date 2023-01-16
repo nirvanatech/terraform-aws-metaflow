@@ -96,6 +96,17 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   engine_version     = aws_rds_cluster.this[0].engine_version
 }
 
+resource "aws_db_parameter_group" "db_metaflow" {
+  name   = "${var.resource_prefix}${var.db_name}-parameters${var.resource_suffix}"
+  family = "${var.db_engine}${var.db_engine_version}"
+
+  # long-tail query logging for queries taking > 100 ms
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "100"
+  }
+}
+
 /*
  Define rds db instance.
 */
@@ -118,6 +129,16 @@ resource "aws_db_instance" "this" {
   multi_az                  = true                                                                                                           # Multiple availability zone?
   final_snapshot_identifier = "${var.resource_prefix}${var.db_name}-final-snapshot${var.resource_suffix}-${random_pet.final_snapshot_id.id}" # Snapshot upon delete
   vpc_security_group_ids    = [aws_security_group.rds_security_group.id]
+
+  # enable performance insights for debugging performance issues
+  # note: only certain values are allowed for retention_period (check docs),
+  # using retention period > 7 days will put us beyond the free tier.
+  performance_insights_enabled          = true
+  performance_insights_retention_period = 7
+  # enable long tail query logging and export logs to CW so that they are not
+  # deleted on expiry.
+  parameter_group_name            = aws_db_parameter_group.db_metaflow.name
+  enabled_cloudwatch_logs_exports = "postgresql"
 
   tags = merge(
     var.standard_tags,
