@@ -42,6 +42,7 @@ module "metaflow-metadata-service" {
   standard_tags = var.tags
 }
 
+# depends-on: metaflow-datastore, metaflow-metadata-service
 module "metaflow-ui" {
   source = "./modules/ui"
   count  = var.ui_certificate_arn == "" ? 0 : 1
@@ -79,6 +80,7 @@ module "metaflow-ui" {
 
 }
 
+# depends-on: 
 module "metaflow-computation" {
   source = "./modules/computation"
 
@@ -99,6 +101,7 @@ module "metaflow-computation" {
   standard_tags = var.tags
 }
 
+# depends-on: metaflow-computation, metaflow-datastore
 module "metaflow-step-functions" {
   source = "./modules/step-functions"
 
