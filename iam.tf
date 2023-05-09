@@ -248,3 +248,14 @@ resource "aws_iam_role_policy" "grant_cloudwatch" {
   role   = aws_iam_role.batch_s3_task_role.name
   policy = data.aws_iam_policy_document.cloudwatch.json
 }
+
+# Create ECS Task Execution IAM role and policy to run ECS tasks
+resource "aws_iam_role" "ecsTaskExecutionRole" {
+  name               = "${var.resource_prefix}ecsTaskExecutionRole${var.resource_suffix}"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
+  role       = aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}

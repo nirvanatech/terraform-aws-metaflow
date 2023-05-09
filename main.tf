@@ -4,10 +4,9 @@ module "metaflow-datastore" {
   resource_prefix = local.resource_prefix
   resource_suffix = local.resource_suffix
 
-  metadata_service_security_group_id = module.metaflow-metadata-service.metadata_service_security_group_id
-  metaflow_vpc_id                    = var.vpc_id
-  subnet1_id                         = var.subnet1_id
-  subnet2_id                         = var.subnet2_id
+  metaflow_vpc_id = var.vpc_id
+  subnet1_id      = var.subnet1_id
+  subnet2_id      = var.subnet2_id
 
   db_engine         = var.datastore_db_engine
   db_engine_version = var.datastore_db_engine_version
@@ -15,6 +14,7 @@ module "metaflow-datastore" {
   standard_tags = var.tags
 }
 
+# depends-on: metaflow-datastore
 module "metaflow-metadata-service" {
   source = "./modules/metadata-service"
 
@@ -26,8 +26,9 @@ module "metaflow-metadata-service" {
   database_name                    = module.metaflow-datastore.database_name
   database_password                = module.metaflow-datastore.database_password
   database_username                = module.metaflow-datastore.database_username
+  database_sg_id                   = module.metaflow-datastore.database_sg_id
   datastore_s3_bucket_kms_key_arn  = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
-  fargate_execution_role_arn       = module.metaflow-computation.ecs_execution_role_arn
+  fargate_execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
   iam_partition                    = var.iam_partition
   metadata_service_container_image = local.metadata_service_container_image
   metaflow_vpc_id                  = var.vpc_id
@@ -52,7 +53,7 @@ module "metaflow-ui" {
   database_password               = module.metaflow-datastore.database_password
   database_username               = module.metaflow-datastore.database_username
   datastore_s3_bucket_kms_key_arn = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
-  fargate_execution_role_arn      = module.metaflow-computation.ecs_execution_role_arn
+  fargate_execution_role_arn      = aws_iam_role.ecsTaskExecutionRole.arn
   iam_partition                   = var.iam_partition
   metaflow_vpc_id                 = var.vpc_id
   rds_master_instance_endpoint    = module.metaflow-datastore.rds_master_instance_endpoint
