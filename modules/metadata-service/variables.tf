@@ -25,6 +25,11 @@ variable "database_username" {
   description = "The database username"
 }
 
+variable "database_sg_id" {
+  type        = string
+  description = "We will use this to add a ingress rule to RDS sg to allow metadata service access"
+}
+
 variable "datastore_s3_bucket_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key used to encrypt the Metaflow datastore S3 bucket"

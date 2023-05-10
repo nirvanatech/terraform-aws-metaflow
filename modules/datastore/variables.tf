@@ -31,11 +31,6 @@ variable "db_username" {
   default     = "metaflow"
 }
 
-variable "metadata_service_security_group_id" {
-  type        = string
-  description = "The security group ID used by the MetaData service. We'll grant this access to our DB."
-}
-
 variable "metaflow_vpc_id" {
   type        = string
   description = "ID of the Metaflow VPC this SageMaker notebook instance is to be deployed in"

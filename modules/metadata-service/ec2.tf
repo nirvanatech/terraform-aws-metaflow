@@ -44,6 +44,16 @@ resource "aws_security_group" "metadata_service_security_group" {
   )
 }
 
+# Inject a ingress rule to RDS's sg to allow ingress only from port 5432
+resource "aws_security_group_rule" "rds_sg_ingress" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.metadata_service_security_group.id
+  security_group_id        = var.database_sg_id
+}
+
 resource "aws_lb" "this" {
   name               = "${var.resource_prefix}nlb${var.resource_suffix}"
   internal           = true

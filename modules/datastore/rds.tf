@@ -26,16 +26,6 @@ resource "aws_security_group" "rds_security_group" {
   tags = var.standard_tags
 }
 
-# ingress only from port 5432
-resource "aws_security_group_rule" "rds_sg_ingress" {
-  type = "ingress"
-  from_port = 5432
-  to_port = 5432
-  protocol = "tcp"
-  source_security_group_id = var.metadata_service_security_group_id
-  security_group_id = aws_security_group.rds_security_group.id
-}
-
 # egress to anywhere
 resource "aws_security_group_rule" "rds_sg_egress" {
   type = "egress"
