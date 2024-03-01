@@ -66,5 +66,6 @@ resource "aws_ecs_service" "ui_static" {
     ignore_changes = [desired_count]
   }
 
-  tags = var.standard_tags
+  tags           = var.standard_tags
+  propagate_tags = "TASK_DEFINITION"
 }
