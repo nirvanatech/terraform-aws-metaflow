@@ -28,11 +28,11 @@ resource "aws_security_group" "rds_security_group" {
 
 # egress to anywhere
 resource "aws_security_group_rule" "rds_sg_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.rds_security_group.id
 }
 
@@ -111,7 +111,7 @@ resource "aws_db_instance" "this" {
   engine_version            = var.db_engine_version
   instance_class            = var.db_instance_type                                         # Hardware configuration
   identifier                = "${var.resource_prefix}${var.db_name}${var.resource_suffix}" # used for dns hostname needs to be customer unique in region
-  name                      = var.db_name                                                  # unique id for CLI commands (name of DB table which is why we're not adding the prefix as no conflicts will occur and the API expects this table name)
+  db_name                   = var.db_name                                                  # unique id for CLI commands (name of DB table which is why we're not adding the prefix as no conflicts will occur and the API expects this table name)
   username                  = var.db_username
   password                  = random_password.this.result
   db_subnet_group_name      = aws_db_subnet_group.this.id
