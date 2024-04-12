@@ -60,3 +60,15 @@ variable "subnet2_id" {
   type        = string
   description = "Second subnet used for availability zone redundancy"
 }
+
+variable "enable_s3_intelligent_tiering" {
+  type        = bool
+  description = "Choose to enable intelligent tiering on s3 bucket for reduced costs"
+  default     = false
+}
+
+variable "db_multi_az" {
+  type        = bool
+  description = "Choose whether to enable multi-az deployments for increased fault tolerance of database"
+  default     = true
+}
