@@ -7,8 +7,6 @@ resource "aws_ecs_task_definition" "ui_backend" {
       name      = "${var.resource_prefix}ui_backend${var.resource_suffix}"
       image     = var.ui_backend_container_image
       essential = true
-      cpu       = 2048
-      memory    = 16384
       portMappings = [
         {
           containerPort = 8083
@@ -36,8 +34,8 @@ resource "aws_ecs_task_definition" "ui_backend" {
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.metadata_ui_ecs_task_role.arn
   execution_role_arn       = var.fargate_execution_role_arn
-  cpu                      = 2048
-  memory                   = 16384
+  cpu                      = var.ui_backend_cpu
+  memory                   = var.ui_backend_memory
 
   ephemeral_storage {
     size_in_gib = 100

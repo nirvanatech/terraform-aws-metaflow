@@ -128,19 +128,39 @@ variable "alb_internal" {
 }
 
 variable "cognito_user_pool_arn" {
-  type = string
+  type        = string
   description = "Cognito user pool ARN"
-  default = ""
+  default     = ""
 }
 
 variable "cognito_user_pool_client_id" {
-  type = string
+  type        = string
   description = "Cognito user pool client id"
-  default = ""
+  default     = ""
 }
 
 variable "cognito_user_pool_domain" {
-  type = string
+  type        = string
   description = "Cognito user pool domain"
-  default = ""
+  default     = ""
+}
+
+variable "ui_static_cpu" {
+  type    = number
+  default = 512
+}
+
+variable "ui_static_memory" {
+  type    = number
+  default = 1024
+}
+
+variable "ui_backend_cpu" {
+  type    = number
+  default = 2048
+}
+
+variable "ui_backend_memory" {
+  type    = number
+  default = 16384
 }

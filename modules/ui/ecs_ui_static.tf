@@ -8,8 +8,6 @@ resource "aws_ecs_task_definition" "ui_static" {
       name      = "${var.resource_prefix}ui_static${var.resource_suffix}"
       image     = var.ui_static_container_image
       essential = true
-      cpu       = 512
-      memory    = 1024
       portMappings = [
         {
           containerPort = 3000
@@ -32,8 +30,8 @@ resource "aws_ecs_task_definition" "ui_static" {
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.metadata_ui_ecs_task_role.arn
   execution_role_arn       = var.fargate_execution_role_arn
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = var.ui_static_cpu
+  memory                   = var.ui_static_memory
 
   tags = merge(
     var.standard_tags,
