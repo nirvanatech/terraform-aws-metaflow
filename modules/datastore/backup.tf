@@ -1,5 +1,5 @@
 resource "aws_backup_plan" "rds_cont_backup" {
-  name = "metaflow_rds_cont_backup_plan"
+  name = "${var.resource_prefix}rds_cont_backup_plan${var.resource_suffix}"
 
   rule {
     rule_name                = "metaflow_rds_cont_backup_rule"
@@ -13,19 +13,19 @@ resource "aws_backup_plan" "rds_cont_backup" {
 }
 
 resource "aws_backup_vault" "rds_cont_backup" {
-  name = "metaflow_rds_cont_backup_vault"
+  name = "${var.resource_prefix}rds_cont_backup_vault${var.resource_suffix}"
 }
 
 resource "aws_backup_selection" "rds_cont_backup" {
   iam_role_arn = aws_iam_role.rds_cont_backup.arn
-  name         = "metaflow_rds_cont_backup_selection"
+  name         = "${var.resource_prefix}rds_cont_backup_selection${var.resource_suffix}"
   plan_id      = aws_backup_plan.rds_cont_backup.id
 
-  resources = [ aws_db_instance.this[0].arn ]
+  resources = [aws_db_instance.this[0].arn]
 }
 
 resource "aws_iam_role" "rds_cont_backup" {
-  name               = "metaflow-rds-cont-backup-role"
+  name               = "${var.resource_prefix}rds-cont-backup-role${var.resource_suffix}"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
