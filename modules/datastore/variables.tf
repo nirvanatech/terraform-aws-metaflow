@@ -14,6 +14,11 @@ variable "db_engine_version" {
   default = "11"
 }
 
+variable "db_parameter_group_family" {
+  type    = string
+  default = "postgres11"
+}
+
 variable "db_name" {
   type        = string
   description = "Name of PostgresQL database for Metaflow service."

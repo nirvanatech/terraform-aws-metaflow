@@ -87,13 +87,19 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 }
 
 resource "aws_db_parameter_group" "db_metaflow" {
-  name   = "${var.resource_prefix}${var.db_name}-parameters${var.resource_suffix}"
-  family = "postgres11"
+  # use name_prefix instead of name for lifecycle rule to work properly
+  name_prefix = "${var.resource_prefix}${var.db_name}-parameters${var.resource_suffix}"
+  family      = var.db_parameter_group_family
 
   # long-tail query logging for queries taking > 100 ms
   parameter {
     name  = "log_min_duration_statement"
     value = "100"
+  }
+
+  lifecycle {
+    # see: https://developer.hashicorp.com/terraform/tutorials/aws/rds-upgrade
+    create_before_destroy = true
   }
 }
 
