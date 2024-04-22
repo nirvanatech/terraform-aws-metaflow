@@ -7,7 +7,7 @@ locals {
 
   # Name of S3 bucket
   s3_bucket_name_prefix = "${var.resource_prefix}s3${var.resource_suffix}"
-  s3_bucket_name        = var.randomize_s3_name ? "${local.s3_bucket_name_prefix}-${random_string.bucket_suffix.result}" : local.s3_bucket_name_prefix
+  s3_bucket_name        = var.randomize_s3_name ? "${local.s3_bucket_name_prefix}-${random_string.bucket_suffix[0].result}" : local.s3_bucket_name_prefix
 }
 
 resource "random_string" "bucket_suffix" {
