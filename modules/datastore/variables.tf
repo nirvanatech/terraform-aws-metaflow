@@ -51,6 +51,12 @@ variable "resource_suffix" {
   description = "Suffix given to all AWS resources to differentiate between environment and workspace"
 }
 
+variable "randomize_s3_name" {
+  type        = bool
+  default     = false
+  description = "If set to true, adds a 8-character random alphanumeric suffix to s3 bucket name to make it globally unique"
+}
+
 variable "standard_tags" {
   type        = map(string)
   description = "The standard tags to apply to every AWS resource."
