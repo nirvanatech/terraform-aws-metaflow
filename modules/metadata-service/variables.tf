@@ -30,6 +30,12 @@ variable "database_sg_id" {
   description = "We will use this to add a ingress rule to RDS sg to allow metadata service access"
 }
 
+variable "database_aio_pool_max" {
+  type        = number
+  description = "Maximum active DB connections allowed to be held by the metadata service to the database"
+  default     = 10
+}
+
 variable "datastore_s3_bucket_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key used to encrypt the Metaflow datastore S3 bucket"
