@@ -33,6 +33,7 @@ resource "aws_ecs_task_definition" "this" {
     ],
     "environment": [
       {"name": "MF_METADATA_DB_POOL_MAX", "value": "${var.database_aio_pool_max}"},
+      {"name": "MF_METADATA_DB_TIMEOUT", "value": "${var.database_aio_timeout}"},
       {"name": "MF_METADATA_DB_HOST", "value": "${replace(var.rds_master_instance_endpoint, ":5432", "")}"},
       {"name": "MF_METADATA_DB_NAME", "value": "${var.database_name}"},
       {"name": "MF_METADATA_DB_PORT", "value": "5432"},

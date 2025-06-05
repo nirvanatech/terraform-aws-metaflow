@@ -36,6 +36,12 @@ variable "database_aio_pool_max" {
   default     = 10
 }
 
+variable "database_aio_timeout" {
+  type        = number
+  description = "Timeout for database API calls from the metadata service"
+  default     = 60
+}
+
 variable "datastore_s3_bucket_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key used to encrypt the Metaflow datastore S3 bucket"
