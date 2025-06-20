@@ -141,7 +141,7 @@ resource "aws_lb_target_group" "alb_main" {
   vpc_id                        = var.metaflow_vpc_id
 
   health_check {
-    protocol            = "TCP"
+    protocol            = "HTTP"
     interval            = 10
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -160,7 +160,7 @@ resource "aws_lb_target_group" "alb_db_migrate" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol            = "TCP"
+    protocol            = "HTTP"
     port                = 8080
     interval            = 10
     healthy_threshold   = 2
@@ -184,7 +184,7 @@ resource "aws_lb_listener" "alb_main" {
 
 resource "aws_lb_listener" "alb_db_migrate" {
   count             = var.setup_alb ? 1 : 0
-  load_balancer_arn = aws_lb.this.arn
+  load_balancer_arn = aws_lb.alb.arn
   port              = "8082"
   protocol          = "HTTP"
 
