@@ -172,24 +172,24 @@ resource "aws_lb_target_group" "alb_db_migrate" {
 
 resource "aws_lb_listener" "alb_main" {
   count             = var.setup_alb ? 1 : 0
-  load_balancer_arn = aws_lb.alb.arn
+  load_balancer_arn = aws_lb.alb[0].arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_main.arn
+    target_group_arn = aws_lb_target_group.alb_main[0].arn
   }
 }
 
 resource "aws_lb_listener" "alb_db_migrate" {
   count             = var.setup_alb ? 1 : 0
-  load_balancer_arn = aws_lb.alb.arn
+  load_balancer_arn = aws_lb.alb[0].arn
   port              = "8082"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_db_migrate.arn
+    target_group_arn = aws_lb_target_group.alb_db_migrate[0].arn
   }
 }

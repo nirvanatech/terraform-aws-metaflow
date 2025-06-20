@@ -69,7 +69,7 @@ EOF
 
 locals {
   alb_ports         = var.setup_alb ? [8080, 8082] : []
-  alb_target_groups = var.setup_alb ? [aws_lb_target_group.alb_main.arn, aws_lb_target_group.alb_db_migrate.arn] : []
+  alb_target_groups = var.setup_alb ? [aws_lb_target_group.alb_main[0].arn, aws_lb_target_group.alb_db_migrate[0].arn] : []
 }
 
 resource "aws_ecs_service" "this" {
