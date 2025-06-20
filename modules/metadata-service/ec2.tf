@@ -119,3 +119,77 @@ resource "aws_lb_listener" "db_migrate" {
     target_group_arn = aws_lb_target_group.db_migrate.id
   }
 }
+
+resource "aws_lb" "alb" {
+  count              = var.setup_alb ? 1 : 0
+  name               = "${var.resource_prefix}alb${var.resource_suffix}"
+  internal           = true
+  load_balancer_type = "application"
+  idle_timeout       = 180 # 3 minutes
+  subnets            = [var.subnet1_id, var.subnet2_id]
+
+  tags = var.standard_tags
+}
+
+resource "aws_lb_target_group" "alb_main" {
+  count                         = var.setup_alb ? 1 : 0
+  name                          = "${var.resource_prefix}alb-mdtg${var.resource_suffix}"
+  port                          = 8080
+  protocol                      = "HTTP"
+  load_balancing_algorithm_type = "least_outstanding_requests"
+  target_type                   = "ip"
+  vpc_id                        = var.metaflow_vpc_id
+
+  health_check {
+    protocol            = "TCP"
+    interval            = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+
+  tags = var.standard_tags
+}
+
+
+resource "aws_lb_target_group" "alb_db_migrate" {
+  count       = var.setup_alb ? 1 : 0
+  name        = "${var.resource_prefix}alb-dbtg${var.resource_suffix}"
+  port        = 8082
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = var.metaflow_vpc_id
+
+  health_check {
+    protocol            = "TCP"
+    port                = 8080
+    interval            = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+
+  tags = var.standard_tags
+}
+
+resource "aws_lb_listener" "alb_main" {
+  count             = var.setup_alb ? 1 : 0
+  load_balancer_arn = aws_lb.alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_main.arn
+  }
+}
+
+resource "aws_lb_listener" "alb_db_migrate" {
+  count             = var.setup_alb ? 1 : 0
+  load_balancer_arn = aws_lb.this.arn
+  port              = "8082"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_db_migrate.arn
+  }
+}
