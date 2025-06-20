@@ -127,6 +127,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   idle_timeout       = 180 # 3 minutes
   subnets            = [var.subnet1_id, var.subnet2_id]
+  security_groups    = [aws_security_group.metadata_service_security_group.id]
 
   tags = var.standard_tags
 }
