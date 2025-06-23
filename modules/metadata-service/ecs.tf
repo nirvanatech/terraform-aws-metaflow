@@ -98,12 +98,11 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = range(length(local.alb_ports))
-    iterator = "i"
+    for_each = local.alb_ports
     content {
-      target_group_arn = local.alb_target_groups[i.value]
+      target_group_arn = local.alb_target_groups[load_balancer.key]
       container_name   = "${var.resource_prefix}service${var.resource_suffix}"
-      container_port   = local.alb_ports[i.value]
+      container_port   = load_balancer.value
     }
   }
 
