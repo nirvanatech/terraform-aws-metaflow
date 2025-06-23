@@ -122,7 +122,7 @@ resource "aws_lb_listener" "db_migrate" {
 
 resource "aws_lb" "alb" {
   count              = var.setup_alb ? 1 : 0
-  name               = "${var.resource_prefix}alb${var.resource_suffix}"
+  name               = "${var.resource_prefix}metadata-alb${var.resource_suffix}"
   internal           = true
   load_balancer_type = "application"
   idle_timeout       = 180 # 3 minutes
