@@ -141,14 +141,9 @@ resource "aws_lb_target_group" "alb_main" {
   target_type                   = "ip"
   vpc_id                        = var.metaflow_vpc_id
 
-  health_check {
-    protocol            = "HTTP"
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
   tags = var.standard_tags
+
+  depends_on = [aws_lb.alb]
 }
 
 
@@ -160,15 +155,9 @@ resource "aws_lb_target_group" "alb_db_migrate" {
   target_type = "ip"
   vpc_id      = var.metaflow_vpc_id
 
-  health_check {
-    protocol            = "HTTP"
-    port                = 8080
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
   tags = var.standard_tags
+
+  depends_on = [aws_lb.alb]
 }
 
 resource "aws_lb_listener" "alb_main" {
