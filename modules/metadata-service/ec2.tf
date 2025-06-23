@@ -141,6 +141,13 @@ resource "aws_lb_target_group" "alb_main" {
   target_type                   = "ip"
   vpc_id                        = var.metaflow_vpc_id
 
+  health_check {
+    protocol = "HTTP"
+    matcher  = "200,202"
+    timeout  = 30
+    path     = "/healthcheck"
+  }
+
   tags = var.standard_tags
 
   depends_on = [aws_lb.alb]
@@ -154,6 +161,14 @@ resource "aws_lb_target_group" "alb_db_migrate" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.metaflow_vpc_id
+
+  health_check {
+    protocol = "HTTP"
+    port     = 8080
+    matcher  = "200,202"
+    timeout  = 30
+    path     = "/healthcheck"
+  }
 
   tags = var.standard_tags
 
