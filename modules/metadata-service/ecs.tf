@@ -67,6 +67,11 @@ EOF
   )
 }
 
+locals {
+  alb_ports         = var.setup_alb ? [8080, 8082] : []
+  alb_target_groups = var.setup_alb ? [aws_lb_target_group.alb_main[0].arn, aws_lb_target_group.alb_db_migrate[0].arn] : []
+}
+
 resource "aws_ecs_service" "this" {
   name            = "${var.resource_prefix}metadata-service${var.resource_suffix}"
   cluster         = aws_ecs_cluster.this.id
@@ -90,6 +95,15 @@ resource "aws_ecs_service" "this" {
     target_group_arn = aws_lb_target_group.db_migrate.arn
     container_name   = "${var.resource_prefix}service${var.resource_suffix}"
     container_port   = 8082
+  }
+
+  dynamic "load_balancer" {
+    for_each = local.alb_ports
+    content {
+      target_group_arn = local.alb_target_groups[load_balancer.key]
+      container_name   = "${var.resource_prefix}service${var.resource_suffix}"
+      container_port   = load_balancer.value
+    }
   }
 
   lifecycle {

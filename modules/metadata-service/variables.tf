@@ -132,3 +132,9 @@ variable "with_public_ip" {
   default     = false
   description = "Enable private IP by default"
 }
+
+variable "setup_alb" {
+  type        = bool
+  default     = false
+  description = "Also setup an ALB for metadata service (will be default once we deprecate NLB completely)"
+}
