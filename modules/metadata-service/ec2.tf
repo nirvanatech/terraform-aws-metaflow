@@ -144,7 +144,7 @@ resource "aws_lb_target_group" "alb_main" {
   health_check {
     protocol = "HTTP"
     matcher  = "200,202"
-    timeout  = 30
+    timeout  = 10
     path     = "/healthcheck"
   }
 
@@ -166,7 +166,7 @@ resource "aws_lb_target_group" "alb_db_migrate" {
     protocol = "HTTP"
     port     = 8080
     matcher  = "200,202"
-    timeout  = 30
+    timeout  = 10
     path     = "/healthcheck"
   }
 
