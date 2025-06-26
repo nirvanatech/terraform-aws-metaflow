@@ -260,7 +260,7 @@ resource "aws_lb" "apigw_nlb" {
 resource "aws_lb_target_group" "apigw_metadata" {
   count       = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
   name        = "${var.resource_prefix}apigw-mdtg${var.resource_suffix}"
-  port        = 8080
+  port        = 80
   protocol    = "TCP"
   target_type = "alb"
   vpc_id      = var.metaflow_vpc_id
@@ -291,7 +291,6 @@ resource "aws_lb_target_group" "apigw_db_migrate" {
 
   health_check {
     protocol            = "TCP"
-    port                = 8080
     interval            = 10
     healthy_threshold   = 2
     unhealthy_threshold = 2
