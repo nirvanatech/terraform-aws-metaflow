@@ -246,3 +246,86 @@ resource "aws_lb_listener" "alb_db_migrate" {
     target_group_arn = aws_lb_target_group.alb_db_migrate[0].arn
   }
 }
+
+resource "aws_lb" "apigw_nlb" {
+  count              = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  name               = "${var.resource_prefix}apigw-nlb${var.resource_suffix}"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = [var.subnet1_id, var.subnet2_id]
+
+  tags = var.standard_tags
+}
+
+resource "aws_lb_target_group" "apigw_metadata" {
+  count       = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  name        = "${var.resource_prefix}apigw-mdtg${var.resource_suffix}"
+  port        = 8080
+  protocol    = "TCP"
+  target_type = "alb"
+  vpc_id      = var.metaflow_vpc_id
+
+  health_check {
+    protocol            = "TCP"
+    interval            = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+
+  tags = var.standard_tags
+}
+
+resource "aws_lb_target_group_attachment" "apigw_metadata" {
+  count            = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  target_group_arn = aws_lb_target_group.apigw_metadata[0].arn
+  target_id        = aws_lb.alb[0].arn
+}
+
+resource "aws_lb_target_group" "apigw_db_migrate" {
+  count       = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  name        = "${var.resource_prefix}apigw-dbtg${var.resource_suffix}"
+  port        = 8082
+  protocol    = "TCP"
+  target_type = "alb"
+  vpc_id      = var.metaflow_vpc_id
+
+  health_check {
+    protocol            = "TCP"
+    port                = 8080
+    interval            = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+
+  tags = var.standard_tags
+}
+
+resource "aws_lb_target_group_attachment" "apigw_db_migrate" {
+  count            = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  target_group_arn = aws_lb_target_group.apigw_db_migrate[0].arn
+  target_id        = aws_lb.alb[0].arn
+}
+
+resource "aws_lb_listener" "apigw_metadata" {
+  count             = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  load_balancer_arn = aws_lb.apigw_nlb[0].arn
+  port              = "80"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.apigw_metadata[0].arn
+  }
+}
+
+resource "aws_lb_listener" "apigw_db_migrate" {
+  count             = var.setup_alb && var.point_api_gateway_to_alb ? 1 : 0
+  load_balancer_arn = aws_lb.apigw_nlb[0].arn
+  port              = "8082"
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.apigw_db_migrate[0].arn
+  }
+}
