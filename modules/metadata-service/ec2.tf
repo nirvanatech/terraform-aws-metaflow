@@ -44,6 +44,52 @@ resource "aws_security_group" "metadata_service_security_group" {
   )
 }
 
+resource "aws_security_group" "metadata_alb_security_group" {
+  name        = local.metadata_alb_security_group_name
+  description = "Security Group for ALB which fronts the Metadata Service."
+  vpc_id      = var.metaflow_vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = var.vpc_cidr_blocks
+    description = "Allow API calls internally"
+  }
+
+  ingress {
+    from_port   = 8082
+    to_port     = 8082
+    protocol    = "tcp"
+    cidr_blocks = var.vpc_cidr_blocks
+    description = "Allow API calls internally"
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+    description = "Internal communication"
+  }
+
+  # egress to anywhere
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # all
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all external communication"
+  }
+
+  tags = merge(
+    var.standard_tags,
+    {
+      Metaflow = "true"
+    }
+  )
+}
+
 # Inject a ingress rule to RDS's sg to allow ingress only from port 5432
 resource "aws_security_group_rule" "rds_sg_ingress" {
   type                     = "ingress"
@@ -127,7 +173,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   idle_timeout       = 180 # 3 minutes
   subnets            = [var.subnet1_id, var.subnet2_id]
-  security_groups    = [aws_security_group.metadata_service_security_group.id]
+  security_groups    = [aws_security_group.metadata_alb_security_group.id]
 
   tags = var.standard_tags
 }
