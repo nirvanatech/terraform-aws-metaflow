@@ -45,6 +45,8 @@ resource "aws_security_group" "metadata_service_security_group" {
 }
 
 resource "aws_security_group" "metadata_alb_security_group" {
+  count = var.setup_alb ? 1 : 0
+
   name        = local.metadata_alb_security_group_name
   description = "Security Group for ALB which fronts the Metadata Service."
   vpc_id      = var.metaflow_vpc_id
@@ -173,7 +175,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   idle_timeout       = 180 # 3 minutes
   subnets            = [var.subnet1_id, var.subnet2_id]
-  security_groups    = [aws_security_group.metadata_alb_security_group.id]
+  security_groups    = [aws_security_group.metadata_alb_security_group[0].id]
 
   tags = var.standard_tags
 }
