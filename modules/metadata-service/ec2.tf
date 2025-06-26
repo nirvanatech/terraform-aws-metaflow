@@ -266,10 +266,10 @@ resource "aws_lb_target_group" "apigw_metadata" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol            = "TCP"
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    protocol = "HTTP"
+    matcher  = "200,202"
+    timeout  = 10
+    path     = "/healthcheck"
   }
 
   tags = var.standard_tags
@@ -290,10 +290,10 @@ resource "aws_lb_target_group" "apigw_db_migrate" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol            = "TCP"
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    protocol = "HTTP"
+    matcher  = "200,202"
+    timeout  = 10
+    path     = "/healthcheck"
   }
 
   tags = var.standard_tags
