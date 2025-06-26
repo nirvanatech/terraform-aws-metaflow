@@ -50,9 +50,14 @@ resource "aws_api_gateway_resource" "db" {
   path_part   = "db_schema_status"
 }
 
+locals {
+  alb_arn      = var.setup_alb && var.point_api_gateway_to_alb ? aws_lb.apigw_nlb[0].arn : aws_lb.this.arn
+  alb_dns_name = var.setup_alb && var.point_api_gateway_to_alb ? aws_lb.apigw_nlb[0].dns_name : aws_lb.this.dns_name
+}
+
 resource "aws_api_gateway_vpc_link" "this" {
   name        = "${var.resource_prefix}vpclink${var.resource_suffix}"
-  target_arns = [aws_lb.this.arn]
+  target_arns = [local.alb_arn]
 
   tags = var.standard_tags
 }
@@ -95,7 +100,7 @@ resource "aws_api_gateway_integration" "this" {
   }
 
   type                    = "HTTP_PROXY"
-  uri                     = "http://${aws_lb.this.dns_name}/{proxy}"
+  uri                     = "http://${local.alb_dns_name}/{proxy}"
   integration_http_method = "ANY"
   passthrough_behavior    = "WHEN_NO_MATCH"
   connection_type         = "VPC_LINK"
@@ -109,7 +114,7 @@ resource "aws_api_gateway_integration" "db" {
 
 
   type                    = "HTTP_PROXY"
-  uri                     = "http://${aws_lb.this.dns_name}:8082/db_schema_status"
+  uri                     = "http://${local.alb_dns_name}:8082/db_schema_status"
   integration_http_method = "GET"
   passthrough_behavior    = "WHEN_NO_MATCH"
   connection_type         = "VPC_LINK"
