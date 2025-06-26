@@ -291,6 +291,7 @@ resource "aws_lb_target_group" "apigw_db_migrate" {
 
   health_check {
     protocol = "HTTP"
+    port     = 80
     matcher  = "200,202"
     timeout  = 10
     path     = "/healthcheck"
