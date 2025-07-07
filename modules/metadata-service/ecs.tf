@@ -68,8 +68,8 @@ EOF
 }
 
 locals {
-  alb_ports         = var.setup_alb ? [8080, 8082] : []
-  alb_target_groups = var.setup_alb ? [aws_lb_target_group.alb_main[0].arn, aws_lb_target_group.alb_db_migrate[0].arn] : []
+  alb_ports         = [8080, 8082]
+  alb_target_groups = [aws_lb_target_group.alb_main.arn, aws_lb_target_group.alb_db_migrate.arn]
 }
 
 resource "aws_ecs_service" "this" {
@@ -83,18 +83,6 @@ resource "aws_ecs_service" "this" {
     security_groups  = [aws_security_group.metadata_service_security_group.id]
     assign_public_ip = var.with_public_ip
     subnets          = [var.subnet1_id, var.subnet2_id]
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.this.arn
-    container_name   = "${var.resource_prefix}service${var.resource_suffix}"
-    container_port   = 8080
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.db_migrate.arn
-    container_name   = "${var.resource_prefix}service${var.resource_suffix}"
-    container_port   = 8082
   }
 
   dynamic "load_balancer" {
