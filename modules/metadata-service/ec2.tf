@@ -161,7 +161,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   idle_timeout       = 180 # 3 minutes
   subnets            = [var.subnet1_id, var.subnet2_id]
-  security_groups    = [aws_security_group.metadata_alb_security_group[0].id]
+  security_groups    = [aws_security_group.metadata_alb_security_group.id]
 
   tags = var.standard_tags
 }
@@ -208,24 +208,24 @@ resource "aws_lb_target_group" "alb_db_migrate" {
 }
 
 resource "aws_lb_listener" "alb_main" {
-  load_balancer_arn = aws_lb.alb[0].arn
+  load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_main[0].arn
+    target_group_arn = aws_lb_target_group.alb_main.arn
   }
 }
 
 resource "aws_lb_listener" "alb_db_migrate" {
-  load_balancer_arn = aws_lb.alb[0].arn
+  load_balancer_arn = aws_lb.alb.arn
   port              = "8082"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_db_migrate[0].arn
+    target_group_arn = aws_lb_target_group.alb_db_migrate.arn
   }
 }
 
@@ -256,8 +256,8 @@ resource "aws_lb_target_group" "apigw_metadata" {
 }
 
 resource "aws_lb_target_group_attachment" "apigw_metadata" {
-  target_group_arn = aws_lb_target_group.apigw_metadata[0].arn
-  target_id        = aws_lb.alb[0].arn
+  target_group_arn = aws_lb_target_group.apigw_metadata.arn
+  target_id        = aws_lb.alb.arn
 }
 
 resource "aws_lb_target_group" "apigw_db_migrate" {
@@ -279,28 +279,28 @@ resource "aws_lb_target_group" "apigw_db_migrate" {
 }
 
 resource "aws_lb_target_group_attachment" "apigw_db_migrate" {
-  target_group_arn = aws_lb_target_group.apigw_db_migrate[0].arn
-  target_id        = aws_lb.alb[0].arn
+  target_group_arn = aws_lb_target_group.apigw_db_migrate.arn
+  target_id        = aws_lb.alb.arn
 }
 
 resource "aws_lb_listener" "apigw_metadata" {
-  load_balancer_arn = aws_lb.apigw_nlb[0].arn
+  load_balancer_arn = aws_lb.apigw_nlb.arn
   port              = "80"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.apigw_metadata[0].arn
+    target_group_arn = aws_lb_target_group.apigw_metadata.arn
   }
 }
 
 resource "aws_lb_listener" "apigw_db_migrate" {
-  load_balancer_arn = aws_lb.apigw_nlb[0].arn
+  load_balancer_arn = aws_lb.apigw_nlb.arn
   port              = "8082"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.apigw_db_migrate[0].arn
+    target_group_arn = aws_lb_target_group.apigw_db_migrate.arn
   }
 }
