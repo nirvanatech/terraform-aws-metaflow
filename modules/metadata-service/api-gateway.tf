@@ -51,8 +51,8 @@ resource "aws_api_gateway_resource" "db" {
 }
 
 locals {
-  alb_arn      = var.setup_alb && var.point_api_gateway_to_alb ? aws_lb.apigw_nlb[0].arn : aws_lb.this.arn
-  alb_dns_name = var.setup_alb && var.point_api_gateway_to_alb ? aws_lb.apigw_nlb[0].dns_name : aws_lb.this.dns_name
+  alb_arn      = aws_lb.apigw_nlb.arn
+  alb_dns_name = aws_lb.apigw_nlb.dns_name
 }
 
 resource "aws_api_gateway_vpc_link" "this" {

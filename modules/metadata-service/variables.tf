@@ -132,15 +132,3 @@ variable "with_public_ip" {
   default     = false
   description = "Enable private IP by default"
 }
-
-variable "setup_alb" {
-  type        = bool
-  default     = false
-  description = "Also setup an ALB for metadata service (will be default once we deprecate NLB completely)"
-}
-
-variable "point_api_gateway_to_alb" {
-  type        = bool
-  default     = false
-  description = "if setup_alb and point_api_gateway_to_alb is true, API gateway will point to ALB instead of NLB"
-}
