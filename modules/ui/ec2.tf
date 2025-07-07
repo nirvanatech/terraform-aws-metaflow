@@ -118,20 +118,21 @@ resource "aws_lb_listener" "this" {
   load_balancer_arn = aws_lb.this.arn
   port              = "443"
   protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
   certificate_arn = var.certificate_arn
 
-  dynamic default_action {
+  dynamic "default_action" {
     for_each = (var.cognito_user_pool_arn != "") ? [""] : []
     content {
       type = "authenticate-cognito"
 
       authenticate_cognito {
         on_unauthenticated_request = "authenticate"
-        scope = "openid"
-        user_pool_arn       = var.cognito_user_pool_arn
-        user_pool_client_id = var.cognito_user_pool_client_id
-        user_pool_domain    = var.cognito_user_pool_domain
+        scope                      = "openid"
+        user_pool_arn              = var.cognito_user_pool_arn
+        user_pool_client_id        = var.cognito_user_pool_client_id
+        user_pool_domain           = var.cognito_user_pool_domain
       }
     }
   }
@@ -147,14 +148,14 @@ resource "aws_lb_listener_rule" "ui_backend" {
   listener_arn = aws_lb_listener.this.arn
   priority     = 1
 
-  dynamic action {
+  dynamic "action" {
     for_each = (var.cognito_user_pool_arn != "") ? [""] : []
     content {
       type = "authenticate-cognito"
 
       authenticate_cognito {
         on_unauthenticated_request = "authenticate"
-        scope = "openid"
+        scope                      = "openid"
 
         user_pool_arn       = var.cognito_user_pool_arn
         user_pool_client_id = var.cognito_user_pool_client_id
