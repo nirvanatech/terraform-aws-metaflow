@@ -175,10 +175,11 @@ resource "aws_lb_target_group" "alb_main" {
   vpc_id                        = var.metaflow_vpc_id
 
   health_check {
-    protocol = "HTTP"
-    matcher  = "200,202"
-    timeout  = 10
-    path     = "/healthcheck"
+    protocol            = "HTTP"
+    matcher             = "200,202"
+    timeout             = 60
+    path                = "/healthcheck"
+    unhealthy_threshold = 5
   }
 
   tags = var.standard_tags
@@ -195,11 +196,12 @@ resource "aws_lb_target_group" "alb_db_migrate" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol = "HTTP"
-    port     = 8080
-    matcher  = "200,202"
-    timeout  = 10
-    path     = "/healthcheck"
+    protocol            = "HTTP"
+    port                = 8080
+    matcher             = "200,202"
+    timeout             = 60
+    path                = "/healthcheck"
+    unhealthy_threshold = 5
   }
 
   tags = var.standard_tags
