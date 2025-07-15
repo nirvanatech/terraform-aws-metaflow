@@ -178,8 +178,9 @@ resource "aws_lb_target_group" "alb_main" {
     protocol            = "HTTP"
     matcher             = "200,202"
     timeout             = 60
+    interval            = 120
     path                = "/healthcheck"
-    unhealthy_threshold = 5
+    unhealthy_threshold = 3
   }
 
   tags = var.standard_tags
@@ -200,8 +201,9 @@ resource "aws_lb_target_group" "alb_db_migrate" {
     port                = 8080
     matcher             = "200,202"
     timeout             = 60
+    interval            = 120
     path                = "/healthcheck"
-    unhealthy_threshold = 5
+    unhealthy_threshold = 3
   }
 
   tags = var.standard_tags
@@ -248,10 +250,12 @@ resource "aws_lb_target_group" "apigw_metadata" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol = "HTTP"
-    matcher  = "200,202"
-    timeout  = 10
-    path     = "/healthcheck"
+    protocol            = "HTTP"
+    matcher             = "200,202"
+    timeout             = 60
+    interval            = 120
+    unhealthy_threshold = 3
+    path                = "/healthcheck"
   }
 
   tags = var.standard_tags
@@ -270,11 +274,13 @@ resource "aws_lb_target_group" "apigw_db_migrate" {
   vpc_id      = var.metaflow_vpc_id
 
   health_check {
-    protocol = "HTTP"
-    port     = 80
-    matcher  = "200,202"
-    timeout  = 10
-    path     = "/healthcheck"
+    protocol            = "HTTP"
+    port                = 80
+    matcher             = "200,202"
+    timeout             = 60
+    interval            = 120
+    unhealthy_threshold = 3
+    path                = "/healthcheck"
   }
 
   tags = var.standard_tags
