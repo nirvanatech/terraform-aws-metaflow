@@ -10,54 +10,67 @@ resource "aws_ecs_cluster" "this" {
   )
 }
 
+locals {
+  main_container_definition_json = <<EOF
+{
+  "name": "${var.resource_prefix}service${var.resource_suffix}",
+  "image": "${var.metadata_service_container_image}",
+  "essential": true,
+  "portMappings": [
+    {
+      "containerPort": 8080,
+      "hostPort": 8080
+    },
+    {
+      "containerPort": 8082,
+      "hostPort": 8082
+    }
+  ],
+  "environment": [
+    {"name": "MF_METADATA_DB_POOL_MAX", "value": "${var.database_aio_pool_max}"},
+    {"name": "MF_METADATA_DB_TIMEOUT", "value": "${var.database_aio_timeout}"},
+    {"name": "MF_METADATA_DB_HOST", "value": "${replace(var.rds_master_instance_endpoint, ":5432", "")}"},
+    {"name": "MF_METADATA_DB_NAME", "value": "${var.database_name}"},
+    {"name": "MF_METADATA_DB_PORT", "value": "5432"},
+    {"name": "MF_METADATA_DB_PSWD", "value": "${var.database_password}"},
+    {"name": "MF_METADATA_DB_USER", "value": "${var.database_username}"}
+  ],
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "${aws_cloudwatch_log_group.this.name}",
+      "awslogs-region": "${data.aws_region.current.name}",
+      "awslogs-stream-prefix": "metadata"
+    }
+  }
+}
+EOF
+
+  main_container_definition = jsondecode(local.main_container_definition_json)
+
+  sidecar_container_definition = var.sidecar_container_definition_json != null ? jsondecode(var.sidecar_container_definition_json) : null
+
+  all_container_definitions = [
+    local.main_container_definition,
+    local.sidecar_container_definition
+  ]
+  all_container_definitions_filtered = [for c in local.all_container_definitions : c if c != null]
+
+  alb_ports         = [8080, 8082]
+  alb_target_groups = [aws_lb_target_group.alb_main.arn, aws_lb_target_group.alb_db_migrate.arn]
+}
+
 resource "aws_ecs_task_definition" "this" {
   family = "${var.resource_prefix}service${var.resource_suffix}" # Unique name for task definition
 
-  container_definitions = <<EOF
-[
-  {
-    "name": "${var.resource_prefix}service${var.resource_suffix}",
-    "image": "${var.metadata_service_container_image}",
-    "essential": true,
-    "cpu": ${var.metadata_service_cpu},
-    "memory": ${var.metadata_service_memory},
-    "portMappings": [
-      {
-        "containerPort": 8080,
-        "hostPort": 8080
-      },
-      {
-        "containerPort": 8082,
-        "hostPort": 8082
-      }
-    ],
-    "environment": [
-      {"name": "MF_METADATA_DB_POOL_MAX", "value": "${var.database_aio_pool_max}"},
-      {"name": "MF_METADATA_DB_TIMEOUT", "value": "${var.database_aio_timeout}"},
-      {"name": "MF_METADATA_DB_HOST", "value": "${replace(var.rds_master_instance_endpoint, ":5432", "")}"},
-      {"name": "MF_METADATA_DB_NAME", "value": "${var.database_name}"},
-      {"name": "MF_METADATA_DB_PORT", "value": "5432"},
-      {"name": "MF_METADATA_DB_PSWD", "value": "${var.database_password}"},
-      {"name": "MF_METADATA_DB_USER", "value": "${var.database_username}"}
-    ],
-    "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-            "awslogs-group": "${aws_cloudwatch_log_group.this.name}",
-            "awslogs-region": "${data.aws_region.current.name}",
-            "awslogs-stream-prefix": "metadata"
-        }
-    }
-  }
-]
-EOF
+  cpu                   = var.metadata_service_cpu
+  memory                = var.metadata_service_memory
+  container_definitions = jsonencode(local.all_container_definitions_filtered)
 
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.metadata_svc_ecs_task_role.arn
   execution_role_arn       = var.fargate_execution_role_arn
-  cpu                      = var.metadata_service_cpu
-  memory                   = var.metadata_service_memory
 
   tags = merge(
     var.standard_tags,
@@ -65,11 +78,6 @@ EOF
       Metaflow = "true"
     }
   )
-}
-
-locals {
-  alb_ports         = [8080, 8082]
-  alb_target_groups = [aws_lb_target_group.alb_main.arn, aws_lb_target_group.alb_db_migrate.arn]
 }
 
 resource "aws_ecs_service" "this" {

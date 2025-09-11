@@ -132,3 +132,9 @@ variable "with_public_ip" {
   default     = false
   description = "Enable private IP by default"
 }
+
+variable "sidecar_container_definition_json" {
+  type        = string
+  default     = null
+  description = "Optional JSON string containing sidecar container definition to append to the main container"
+}
