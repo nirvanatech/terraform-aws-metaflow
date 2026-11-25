@@ -116,7 +116,7 @@ variable "ui_source_ip_allow_list" {
 
   # A bad CIDR would fail at the ALB API after the listener already switched to 403, so reject it at plan time.
   validation {
-    condition     = alltrue([for c in var.ui_source_ip_allow_list : can(cidrhost(c, 0))])
+    condition     = length([for c in var.ui_source_ip_allow_list : c if !can(cidrhost(c, 0))]) == 0
     error_message = "Every entry in ui_source_ip_allow_list must be a valid CIDR block (e.g. 100.64.0.0/10)."
   }
 }
