@@ -113,6 +113,12 @@ variable "ui_source_ip_allow_list" {
     condition     = length(var.ui_source_ip_allow_list) <= 3
     error_message = "ui_source_ip_allow_list supports at most 3 CIDRs (ALB limits a listener rule condition to 3 match evaluations)."
   }
+
+  # A bad CIDR would fail at the ALB API after the listener already switched to 403, so reject it at plan time.
+  validation {
+    condition     = alltrue([for c in var.ui_source_ip_allow_list : can(cidrhost(c, 0))])
+    error_message = "Every entry in ui_source_ip_allow_list must be a valid CIDR block (e.g. 100.64.0.0/10)."
+  }
 }
 
 variable "ui_backend_container_image" {
