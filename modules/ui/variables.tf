@@ -119,6 +119,11 @@ variable "ui_source_ip_allow_list" {
     condition     = length([for c in var.ui_source_ip_allow_list : c if !can(cidrhost(c, 0))]) == 0
     error_message = "Every entry in ui_source_ip_allow_list must be a valid CIDR block (e.g. 100.64.0.0/10)."
   }
+
+  validation {
+    condition     = !contains(var.ui_source_ip_allow_list, "255.255.255.255/32")
+    error_message = "ui_source_ip_allow_list must not contain 255.255.255.255/32; ALB does not accept it in a source-IP condition."
+  }
 }
 
 variable "ui_backend_container_image" {
