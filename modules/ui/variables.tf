@@ -103,6 +103,12 @@ variable "extra_ui_static_env_vars" {
   description = "Additional environment variables for UI static app"
 }
 
+variable "ui_source_ip_allow_list" {
+  type        = list(string)
+  description = "CIDRs allowed to reach the UI ALB listener rules. When non-empty, requests from other sources get a 403; when empty, no source-IP restriction is applied"
+  default     = []
+}
+
 variable "ui_backend_container_image" {
   type        = string
   default     = ""
