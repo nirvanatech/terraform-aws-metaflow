@@ -108,10 +108,10 @@ variable "ui_source_ip_allow_list" {
   description = "CIDRs allowed to reach the UI ALB listener rules. When non-empty, requests from other sources get a 403; when empty, no source-IP restriction is applied"
   default     = []
 
-  # ALB allows 5 condition values per rule; ui_backend also spends one on its /api/* path pattern.
+  # ALB allows 3 match evaluations per condition and 5 per rule (ui_backend also spends one on its /api/* path pattern).
   validation {
-    condition     = length(var.ui_source_ip_allow_list) <= 4
-    error_message = "ui_source_ip_allow_list supports at most 4 CIDRs (ALB limits a listener rule to 5 condition values, and the /api/* rule uses one for its path pattern)."
+    condition     = length(var.ui_source_ip_allow_list) <= 3
+    error_message = "ui_source_ip_allow_list supports at most 3 CIDRs (ALB limits a listener rule condition to 3 match evaluations)."
   }
 }
 
