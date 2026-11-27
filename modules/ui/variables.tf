@@ -111,7 +111,7 @@ variable "ui_source_ip_allow_list" {
   # ALB allows 3 match evaluations per condition and 5 per rule (ui_backend also spends one on its /api/* path pattern).
   validation {
     condition     = length(var.ui_source_ip_allow_list) <= 3
-    error_message = "ui_source_ip_allow_list supports at most 3 CIDRs (ALB limits a listener rule condition to 3 match evaluations)."
+    error_message = "The ui_source_ip_allow_list variable supports at most 3 CIDRs (ALB limits a listener rule condition to 3 match evaluations)."
   }
 
   # A bad CIDR would fail at the ALB API after the listener already switched to 403, so reject it at plan time.
@@ -122,7 +122,7 @@ variable "ui_source_ip_allow_list" {
 
   validation {
     condition     = !contains(var.ui_source_ip_allow_list, "255.255.255.255/32")
-    error_message = "ui_source_ip_allow_list must not contain 255.255.255.255/32; ALB does not accept it in a source-IP condition."
+    error_message = "The ui_source_ip_allow_list variable must not contain 255.255.255.255/32; ALB does not accept it in a source-IP condition."
   }
 }
 
