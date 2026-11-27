@@ -123,7 +123,7 @@ resource "aws_lb_listener" "this" {
   certificate_arn = var.certificate_arn
 
   dynamic "default_action" {
-    for_each = (var.cognito_user_pool_arn != "") ? [""] : []
+    for_each = (var.cognito_user_pool_arn != "" && !local.ui_source_ip_gated) ? [""] : []
     content {
       type = "authenticate-cognito"
 
@@ -137,10 +137,26 @@ resource "aws_lb_listener" "this" {
     }
   }
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ui_static.id
-    order            = 100
+  dynamic "default_action" {
+    for_each = local.ui_source_ip_gated ? [] : [""]
+    content {
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.ui_static.id
+      order            = 100
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = local.ui_source_ip_gated ? [""] : []
+    content {
+      type = "fixed-response"
+
+      fixed_response {
+        content_type = "text/plain"
+        message_body = "Forbidden"
+        status_code  = "403"
+      }
+    }
   }
 }
 
@@ -172,6 +188,51 @@ resource "aws_lb_listener_rule" "ui_backend" {
   condition {
     path_pattern {
       values = ["/api/*"]
+    }
+  }
+
+  dynamic "condition" {
+    for_each = local.ui_source_ip_gated ? [""] : []
+    content {
+      source_ip {
+        values = var.ui_source_ip_allow_list
+      }
+    }
+  }
+}
+
+# Only created when source-IP gating is on: the listener default action is then
+# a 403, so the static frontend needs its own rule.
+resource "aws_lb_listener_rule" "ui_static" {
+  count = local.ui_source_ip_gated ? 1 : 0
+
+  listener_arn = aws_lb_listener.this.arn
+  priority     = 2
+
+  dynamic "action" {
+    for_each = (var.cognito_user_pool_arn != "") ? [""] : []
+    content {
+      type = "authenticate-cognito"
+
+      authenticate_cognito {
+        on_unauthenticated_request = "authenticate"
+        scope                      = "openid"
+
+        user_pool_arn       = var.cognito_user_pool_arn
+        user_pool_client_id = var.cognito_user_pool_client_id
+        user_pool_domain    = var.cognito_user_pool_domain
+      }
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ui_static.arn
+  }
+
+  condition {
+    source_ip {
+      values = var.ui_source_ip_allow_list
     }
   }
 }

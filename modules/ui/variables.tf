@@ -103,6 +103,29 @@ variable "extra_ui_static_env_vars" {
   description = "Additional environment variables for UI static app"
 }
 
+variable "ui_source_ip_allow_list" {
+  type        = list(string)
+  description = "CIDRs allowed to reach the UI ALB listener rules. When non-empty, requests from other sources get a 403; when empty, no source-IP restriction is applied"
+  default     = []
+
+  # ALB allows 3 match evaluations per condition and 5 per rule (ui_backend also spends one on its /api/* path pattern).
+  validation {
+    condition     = length(var.ui_source_ip_allow_list) <= 3
+    error_message = "The ui_source_ip_allow_list variable supports at most 3 CIDRs (ALB limits a listener rule condition to 3 match evaluations)."
+  }
+
+  # A bad CIDR would fail at the ALB API after the listener already switched to 403, so reject it at plan time.
+  validation {
+    condition     = length([for c in var.ui_source_ip_allow_list : c if !can(cidrhost(c, 0))]) == 0
+    error_message = "Every entry in ui_source_ip_allow_list must be a valid CIDR block (e.g. 100.64.0.0/10)."
+  }
+
+  validation {
+    condition     = !contains(var.ui_source_ip_allow_list, "255.255.255.255/32")
+    error_message = "The ui_source_ip_allow_list variable must not contain 255.255.255.255/32; ALB does not accept it in a source-IP condition."
+  }
+}
+
 variable "ui_backend_container_image" {
   type        = string
   default     = ""
